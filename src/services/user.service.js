@@ -27,6 +27,7 @@ async function register(email, password) {
     const user = await User.create({
       email: email,
       password: encryptedPassword,
+      role: "user",
     });
 
     const token = jwt.sign(
