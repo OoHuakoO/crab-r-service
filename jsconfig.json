@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "es6",
+      "checkJs":true,
+      "baseUrl": "./src",
+    },
+    "exclude": ["node_modules", "dist"],
+    "include": ["src/**/*"]
+  }
