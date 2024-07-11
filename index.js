@@ -4,12 +4,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const app = express();
 const port = process.env.PORT || 3000;
-const customerProfile = require("./src/routes/customerProfile.route");
 const user = require("./src/routes/user.route");
-const productOrder = require("./src/routes/productOrder.route");
-const product = require("./src/routes/product.route");
-const customer = require("./src/routes/customer.route");
-const customerOrder = require("./src/routes/customerOrder.route");
 
 app.use(bodyParser.json());
 app.use(
@@ -31,12 +26,7 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
-app.use("/customer-profile", customerProfile);
 app.use("/user", user);
-app.use("/product-order", productOrder);
-app.use("/product", product);
-app.use("/customer", customer);
-app.use("/customer-order", customerOrder);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
