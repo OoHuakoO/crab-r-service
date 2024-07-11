@@ -41,10 +41,7 @@ async function register(email, password) {
 
     return user;
   } catch (error) {
-    console.error(
-      "customerProfile.service error while findByIDCard customer profile:",
-      error
-    );
+    console.error("login.service error register:", error);
     throw error;
   }
 }
@@ -65,10 +62,7 @@ async function login(user) {
 
     return user;
   } catch (error) {
-    console.error(
-      "customerProfile.service error while findByIDCard customer profile:",
-      error
-    );
+    console.error("login.service error while login:", error);
     throw error;
   }
 }
