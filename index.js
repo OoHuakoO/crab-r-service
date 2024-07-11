@@ -27,6 +27,14 @@ db.once("open", () => {
 });
 
 app.use("/user", user);
+app.get("/common/location", location);
+app.get("/common/pool", pool);
+app.post("/water-quality/before", before);
+app.post("/water-quality/after", after);
+app.post("/crab/hatch", hatch);
+app.get("/water-quality/before", before);
+app.get("/water-quality/after", after);
+app.get("/crab/hatch ", hatch);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
