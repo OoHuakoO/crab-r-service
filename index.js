@@ -5,6 +5,9 @@ const mongoose = require("mongoose");
 const app = express();
 const port = process.env.PORT || 3000;
 const user = require("./src/routes/user.route");
+const common = require("./src/routes/common.route");
+const waterQuality = require("./src/routes/waterQuality.route");
+const crab = require("./src/routes/crab.route");
 
 app.use(bodyParser.json());
 app.use(
@@ -27,14 +30,9 @@ db.once("open", () => {
 });
 
 app.use("/user", user);
-app.use("/common/location", location);
-app.use("/common/pool", pool);
-app.use("/water-quality/before", before);
-app.use("/water-quality/after", after);
-app.use("/crab/hatch", hatch);
-app.use("/water-quality/before", before);
-app.use("/water-quality/after", after);
-app.use("/crab/hatch ", hatch);
+app.use("/common", common);
+app.use("/water-quality", waterQuality);
+app.use("/crab", crab);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
