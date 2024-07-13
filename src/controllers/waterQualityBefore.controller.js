@@ -26,13 +26,13 @@ async function createWaterQualityBefore(req, res, next) {
     let salinityImgUrl;
     let phImgUrl;
     let alkalineImgUrl;
-    if (salinityImg[0]) {
+    if (salinityImg && salinityImg.length > 0) {
       salinityImgUrl = await uploadFileFirebase(salinityImg[0]);
     }
-    if (phImg[0]) {
+    if (phImg && phImg.length > 0) {
       phImgUrl = await uploadFileFirebase(phImg[0]);
     }
-    if (alkalineImg[0]) {
+    if (alkalineImg && alkalineImg.length > 0) {
       alkalineImgUrl = await uploadFileFirebase(alkalineImg[0]);
     }
 
