@@ -12,7 +12,7 @@ async function findByEmail(email) {
     return user;
   } catch (error) {
     console.error(
-      "customerProfile.service error while findByIDCard customer profile:",
+      "customerProfile.service findByIDCard customer profile:",
       error
     );
     throw error;
