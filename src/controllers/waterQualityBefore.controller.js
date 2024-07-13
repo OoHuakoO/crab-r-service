@@ -29,7 +29,7 @@ async function createWaterQualityBefore(req, res, next) {
       )
     ) {
       return res.json({
-        data: "All input is required",
+        data: "all input is required",
         status: 400,
       });
     }
@@ -55,7 +55,7 @@ async function createWaterQualityBefore(req, res, next) {
         waterQualityBefore
       );
     console.log(
-      "Saved WaterQualityBefore in controller:",
+      "saved WaterQualityBefore in controller:",
       saveWaterQualityBefore
     );
     res.json({
@@ -99,7 +99,7 @@ async function getWaterQualityBeforeById(req, res, next) {
       );
     if (!waterQualityBefore) {
       return res.json({
-        data: "Water quality before not found",
+        data: "water quality before not found",
         status: 404,
       });
     }

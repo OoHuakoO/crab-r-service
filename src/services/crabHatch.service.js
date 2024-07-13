@@ -7,10 +7,10 @@ async function createCrabHatch(crabHatchData) {
       JSON.stringify(crabHatchData)
     );
     const newCrabHatch = new CrabHatch(crabHatchData);
-    console.log("Created new CrabHatch instance");
+    console.log("created new crabHatch instance");
 
     const saveCrabHatch = await newCrabHatch.save();
-    console.log("Saved CrabHatch:", saveCrabHatch);
+    console.log("saved crabHatch:", saveCrabHatch);
 
     return saveCrabHatch;
   } catch (error) {

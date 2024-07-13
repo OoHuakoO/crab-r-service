@@ -8,7 +8,7 @@ async function createCrabHatch(req, res, next) {
 
     if (!(location && pool && crabEggColor && releaseDate)) {
       return res.json({
-        data: "All input is required",
+        data: "all input is required",
         status: 400,
       });
     }
@@ -22,7 +22,7 @@ async function createCrabHatch(req, res, next) {
     };
 
     const crabHatch = await crabHatchService.createCrabHatch(crabHatchData);
-    console.log("Saved CrabHatch in controller:", crabHatch);
+    console.log("saved crabHatch in controller:", crabHatch);
     res.json({
       data: crabHatch,
       status: 200,
@@ -57,7 +57,7 @@ async function getCrabHatchById(req, res, next) {
     const crabHatch = await crabHatchService.getCrabHatchById(req?.params?.id);
     if (!crabHatch) {
       return res.json({
-        data: "CrabHatch not found",
+        data: "crabHatch not found",
         status: 404,
       });
     }
