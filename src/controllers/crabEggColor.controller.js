@@ -8,7 +8,7 @@ async function createCrabEggColor(req, res, next) {
 
     if (!color) {
       return res.json({
-        data: "Crab egg color is required",
+        data: "crab egg color is required",
         status: 400,
       });
     }
@@ -18,7 +18,7 @@ async function createCrabEggColor(req, res, next) {
     );
     if (crabEggColor) {
       return res.json({
-        data: "Crab egg color already exists",
+        data: "crab egg color already exists",
         status: 409,
       });
     }

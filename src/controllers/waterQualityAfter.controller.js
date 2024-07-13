@@ -29,7 +29,7 @@ async function createWaterQualityAfter(req, res, next) {
       )
     ) {
       return res.json({
-        data: "All input is required",
+        data: "all input is required",
         status: 400,
       });
     }
@@ -53,7 +53,7 @@ async function createWaterQualityAfter(req, res, next) {
     const saveWaterQualityAfter =
       await waterQualityAfterService.createWaterQualityAfter(waterQualityAfter);
     console.log(
-      "Saved WaterQualityAfter in controller:",
+      "saved waterQualityAfter in controller:",
       saveWaterQualityAfter
     );
     res.json({
@@ -95,7 +95,7 @@ async function getWaterQualityAfterById(req, res, next) {
       await waterQualityAfterService.getWaterQualityAfterById(req?.params?.id);
     if (!waterQualityAfter) {
       return res.json({
-        data: "Water quality after not found",
+        data: "water quality after not found",
         status: 404,
       });
     }
