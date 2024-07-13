@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
 
-const WaterQualityAfterSchema = new mongoose.Schema(
+const CrabHatchSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     location: {
       type: String,
     },
@@ -11,11 +16,8 @@ const WaterQualityAfterSchema = new mongoose.Schema(
     crabEggColor: {
       type: String,
     },
-    calciumImg: {
-      type: String,
-    },
     releaseDate: {
-      type: Date,
+      type: String,
     },
     createdAt: {
       type: Date,
@@ -25,9 +27,6 @@ const WaterQualityAfterSchema = new mongoose.Schema(
   { versionKey: false }
 );
 
-const WaterQualityAfter = mongoose.model(
-  "WaterQualityAfter",
-  WaterQualityAfterSchema
-);
+const CrabHatch = mongoose.model("crabHatch", CrabHatchSchema);
 
-module.exports = WaterQualityAfter;
+module.exports = CrabHatch;
