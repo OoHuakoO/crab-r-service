@@ -8,10 +8,10 @@ async function createWaterQualityAfter(waterQualityAfter) {
     );
 
     const newWaterQualityAfter = new WaterQualityAfter(waterQualityAfter);
-    console.log("created new WaterQualityAfter instance");
+    console.log("created new waterQualityAfter instance");
 
     const saveWaterQualityAfter = await newWaterQualityAfter.save();
-    console.log("saved WaterQualityAfter:", saveWaterQualityAfter);
+    console.log("saved waterQualityAfter:", saveWaterQualityAfter);
 
     return saveWaterQualityAfter;
   } catch (error) {

@@ -16,7 +16,7 @@ async function findByColorCrabEggColor(color) {
 
 async function createCrabEggColor(color) {
   try {
-    console.log("start crabEggColor.service crabEggColor color:", color);
+    console.log("start crabEggColor.service createCrabEggColor color:", color);
     const crabEggColor = await CrabEggColor.create({ color: color });
     return crabEggColor;
   } catch (error) {

@@ -16,27 +16,25 @@ async function createWaterQualityAfter(req, res, next) {
     const { ammoniaImg, calciumImg, magnesiumImg } = req.files;
     const userId = req.user.user_id;
 
-    if (
-      !(
-        location &&
-        pool &&
-        ammonia &&
-        calcium &&
-        magnesium &&
-        ammoniaImg?.[0] &&
-        calciumImg?.[0] &&
-        magnesiumImg?.[0]
-      )
-    ) {
+    if (!(location && pool && ammonia && calcium && magnesium)) {
       return res.json({
-        data: "all input is required",
+        data: "All input is required",
         status: 400,
       });
     }
 
-    const ammoniaImgUrl = await uploadFileFirebase(ammoniaImg[0]);
-    const calciumImgUrl = await uploadFileFirebase(calciumImg[0]);
-    const magnesiumImgUrl = await uploadFileFirebase(magnesiumImg[0]);
+    let ammoniaImgUrl;
+    let calciumImgUrl;
+    let magnesiumImgUrl;
+    if (ammoniaImg[0]) {
+      ammoniaImgUrl = await uploadFileFirebase(ammoniaImg[0]);
+    }
+    if (calciumImg[0]) {
+      calciumImgUrl = await uploadFileFirebase(calciumImg[0]);
+    }
+    if (magnesiumImg[0]) {
+      magnesiumImgUrl = await uploadFileFirebase(magnesiumImg[0]);
+    }
 
     const waterQualityAfter = {
       userId,

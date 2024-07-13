@@ -16,27 +16,25 @@ async function createWaterQualityBefore(req, res, next) {
     const { salinityImg, phImg, alkalineImg } = req.files;
     const userId = req.user.user_id;
 
-    if (
-      !(
-        location &&
-        pool &&
-        salinity &&
-        ph &&
-        alkaline &&
-        salinityImg?.[0] &&
-        phImg?.[0] &&
-        alkalineImg?.[0]
-      )
-    ) {
+    if (!(location && pool && salinity && ph && alkaline)) {
       return res.json({
-        data: "all input is required",
+        data: "All input is required",
         status: 400,
       });
     }
 
-    const salinityImgUrl = await uploadFileFirebase(salinityImg[0]);
-    const phImgUrl = await uploadFileFirebase(phImg[0]);
-    const alkalineImgUrl = await uploadFileFirebase(alkalineImg[0]);
+    let salinityImgUrl;
+    let phImgUrl;
+    let alkalineImgUrl;
+    if (salinityImg[0]) {
+      salinityImgUrl = await uploadFileFirebase(salinityImg[0]);
+    }
+    if (phImg[0]) {
+      phImgUrl = await uploadFileFirebase(phImg[0]);
+    }
+    if (alkalineImg[0]) {
+      alkalineImgUrl = await uploadFileFirebase(alkalineImg[0]);
+    }
 
     const waterQualityBefore = {
       userId,
