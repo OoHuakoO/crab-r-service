@@ -6,8 +6,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 const user = require("./src/routes/user.route");
 const common = require("./src/routes/common.route");
-const waterQuality = require("./src/routes/waterQuality.route");
-const crab = require("./src/routes/crab.route");
+const waterQualityBefore = require("./src/routes/waterQualityBefore.route");
+const waterQualityAfter = require("./src/routes/waterQualityAfter.route");
+const crabEggColor = require("./src/routes/crabEggColor.route");
+const crabHatch = require("./src/routes/crabHatch.route");
 
 app.use(bodyParser.json());
 app.use(
@@ -31,8 +33,10 @@ db.once("open", () => {
 
 app.use("/user", user);
 app.use("/common", common);
-app.use("/water-quality", waterQuality);
-app.use("/crab", crab);
+app.use("/water-quality-before", waterQualityBefore);
+app.use("/water-quality-after", waterQualityAfter);
+app.use("/crab-egg-color", crabEggColor);
+app.use("/crab-hatch", crabHatch);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

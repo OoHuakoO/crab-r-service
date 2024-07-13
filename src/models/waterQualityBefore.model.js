@@ -2,10 +2,24 @@ const mongoose = require("mongoose");
 
 const WaterQualityBeforeSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     location: {
       type: String,
     },
     pool: {
+      type: String,
+    },
+    salinity: {
+      type: String,
+    },
+    ph: {
+      type: String,
+    },
+    alkaline: {
       type: String,
     },
     salinityImg: {
