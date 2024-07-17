@@ -9,7 +9,7 @@ async function register(req, res, next) {
     const { email, password } = req?.body;
 
     if (!(email && password)) {
-      res.json({
+      return res.json({
         data: "all input is required",
         status: 400,
       });
@@ -17,13 +17,13 @@ async function register(req, res, next) {
 
     const user = await userService.findByEmail(email);
     if (user) {
-      res.json({
+      return res.json({
         data: "user already exist. Please login",
         status: 409,
       });
     }
     const userRegister = await userService.register(email, password);
-    res.json({
+    return res.json({
       data: userRegister,
       status: 200,
     });
@@ -44,7 +44,7 @@ async function login(req, res, next) {
     const { email, password } = req?.body;
 
     if (!(email && password)) {
-      res.json({
+      return res.json({
         data: "all input is required",
         status: 400,
       });
@@ -53,12 +53,12 @@ async function login(req, res, next) {
     const user = await userService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       const userLogin = await userService.login(user);
-      res.json({
+      return res.json({
         data: userLogin,
         status: 200,
       });
     } else {
-      res.json({
+      return res.json({
         data: "user not found please try again",
         status: 400,
       });

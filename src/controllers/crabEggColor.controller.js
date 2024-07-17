@@ -24,7 +24,7 @@ async function createCrabEggColor(req, res, next) {
     }
 
     const newCrabEggColor = await crabEggColorService.createCrabEggColor(color);
-    res.json({
+    return res.json({
       data: newCrabEggColor,
       status: 200,
     });
@@ -40,7 +40,7 @@ async function getCrabEggColor(req, res, next) {
     console.log("start getCrabEggColor.controller");
 
     const crabEggColors = await crabEggColorService.findAllCrabEggColor();
-    res.json({
+    return res.json({
       data: crabEggColors,
       status: 200,
     });

@@ -56,7 +56,7 @@ async function createWaterQualityBefore(req, res, next) {
       "saved WaterQualityBefore in controller:",
       saveWaterQualityBefore
     );
-    res.json({
+    return res.json({
       data: saveWaterQualityBefore,
       status: 200,
     });
@@ -73,7 +73,7 @@ async function getWaterQualityBefore(req, res, next) {
 
     const waterQualityBefore =
       await waterQualityBeforeService.getWaterQualityBefore();
-    res.json({
+    return res.json({
       data: waterQualityBefore,
       status: 200,
     });
@@ -101,7 +101,7 @@ async function getWaterQualityBeforeById(req, res, next) {
         status: 404,
       });
     }
-    res.json({
+    return res.json({
       data: waterQualityBefore,
       status: 200,
     });

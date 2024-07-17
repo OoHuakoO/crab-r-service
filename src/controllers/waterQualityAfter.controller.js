@@ -54,7 +54,7 @@ async function createWaterQualityAfter(req, res, next) {
       "saved waterQualityAfter in controller:",
       saveWaterQualityAfter
     );
-    res.json({
+    return res.json({
       data: saveWaterQualityAfter,
       status: 200,
     });
