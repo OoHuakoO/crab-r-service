@@ -23,7 +23,7 @@ async function createCrabHatch(req, res, next) {
 
     const crabHatch = await crabHatchService.createCrabHatch(crabHatchData);
     console.log("saved crabHatch in controller:", crabHatch);
-    res.json({
+    return res.json({
       data: crabHatch,
       status: 200,
     });
@@ -39,7 +39,7 @@ async function getCrabHatch(req, res, next) {
     console.log("start getCrabHatch.controller");
 
     const crabHatches = await crabHatchService.getCrabHatchAll();
-    res.json({
+    return res.json({
       data: crabHatches,
       status: 200,
     });
@@ -61,7 +61,7 @@ async function getCrabHatchById(req, res, next) {
         status: 404,
       });
     }
-    res.json({
+    return res.json({
       data: crabHatch,
       status: 200,
     });

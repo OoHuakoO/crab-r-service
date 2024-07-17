@@ -22,7 +22,7 @@ async function createLocation(req, res, next) {
     }
 
     const newLocation = await commonService.createLocation(name);
-    res.json({
+    return res.json({
       data: newLocation,
       status: 200,
     });
@@ -38,7 +38,7 @@ async function getLocation(req, res, next) {
     console.log("start getLocation.controller");
 
     const locations = await commonService.findAllLocation();
-    res.json({
+    return res.json({
       data: locations,
       status: 200,
     });
@@ -71,7 +71,7 @@ async function createPool(req, res, next) {
     }
 
     const newPool = await commonService.createPool(name);
-    res.json({
+    return res.json({
       data: newPool,
       status: 200,
     });
@@ -87,7 +87,7 @@ async function getPool(req, res, next) {
     console.log("start getPool.controller");
 
     const pools = await commonService.findAllPool();
-    res.json({
+    return res.json({
       data: pools,
       status: 200,
     });
