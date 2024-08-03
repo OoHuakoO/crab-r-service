@@ -19,10 +19,12 @@ async function createCrabHatch(crabHatchData) {
   }
 }
 
-async function getCrabHatchAll() {
+async function getCrabHatchAll(userId) {
   try {
     console.log("start crabHatch.service getCrabHatchAll");
-    const crabHatches = await CrabHatch.find();
+    const crabHatches = await CrabHatch.find({
+      userId: userId,
+    });
     return crabHatches;
   } catch (error) {
     console.error("crabHatch.service getCrabHatchAll error:", error);

@@ -17,10 +17,12 @@ router.post(
 );
 router.get(
   "/getWaterQualityAfter",
+  verifyToken,
   waterQualityController.getWaterQualityAfter
 );
 router.get(
   "/getWaterQualityAfterById/:id",
+  verifyToken,
   waterQualityController.getWaterQualityAfterById
 );
 

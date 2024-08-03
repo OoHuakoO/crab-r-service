@@ -23,11 +23,13 @@ async function createWaterQualityAfter(waterQualityAfter) {
   }
 }
 
-async function getWaterQualityAfter() {
+async function getWaterQualityAfter(userId) {
   try {
     console.log("start waterQualityAfter.service getWaterQualityAfter");
 
-    const waterQualityAfter = await WaterQualityAfter.find();
+    const waterQualityAfter = await WaterQualityAfter.find({
+      userId: userId,
+    });
     return waterQualityAfter;
   } catch (error) {
     console.error(

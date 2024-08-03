@@ -69,8 +69,10 @@ async function getWaterQualityAfter(req, res, next) {
   try {
     console.log("start getWaterQualityAfter.controller");
 
+    const userId = req.user.user_id;
+
     const waterQualityAfter =
-      await waterQualityAfterService.getWaterQualityAfter();
+      await waterQualityAfterService.getWaterQualityAfter(userId);
     res.json({
       data: waterQualityAfter,
       status: 200,
