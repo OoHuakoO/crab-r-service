@@ -8,7 +8,11 @@ router.post(
   verifyToken,
   crabHatchController.createCrabHatch
 );
-router.get("/crabHatchAll", crabHatchController.getCrabHatch);
-router.get("/crabHatchById/:id", crabHatchController.getCrabHatchById);
+router.get("/crabHatchAll", verifyToken, crabHatchController.getCrabHatch);
+router.get(
+  "/crabHatchById/:id",
+  verifyToken,
+  crabHatchController.getCrabHatchById
+);
 
 module.exports = router;

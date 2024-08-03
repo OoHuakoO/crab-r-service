@@ -71,8 +71,10 @@ async function getWaterQualityBefore(req, res, next) {
   try {
     console.log("start getWaterQualityBefore.controller");
 
+    const userId = req.user.user_id;
+
     const waterQualityBefore =
-      await waterQualityBeforeService.getWaterQualityBefore();
+      await waterQualityBeforeService.getWaterQualityBefore(userId);
     return res.json({
       data: waterQualityBefore,
       status: 200,

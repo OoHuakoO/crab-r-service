@@ -23,11 +23,13 @@ async function createWaterQualityBefore(waterQualityBefore) {
   }
 }
 
-async function getWaterQualityBefore() {
+async function getWaterQualityBefore(userId) {
   try {
     console.log("start waterQualityBefore.service getWaterQualityBefore");
 
-    const waterQualityBefore = await WaterQualityBefore.find();
+    const waterQualityBefore = await WaterQualityBefore.find({
+      userId: userId,
+    });
     return waterQualityBefore;
   } catch (error) {
     console.error(
