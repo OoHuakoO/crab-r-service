@@ -23,14 +23,29 @@ async function createWaterQualityAfter(waterQualityAfter) {
   }
 }
 
-async function getWaterQualityAfter(userId) {
+async function getWaterQualityAfter(userId, query) {
   try {
-    console.log("start waterQualityAfter.service getWaterQualityAfter");
+    console.log(
+      "start waterQualityAfter.service getWaterQualityAfter query:",
+      query
+    );
+
+    const page = parseInt(query?.page || 1);
+    const limit = parseInt(query?.limit || 10);
+    const offset = (page - 1) * limit;
 
     const waterQualityAfter = await WaterQualityAfter.find({
       userId: userId,
+    })
+      .sort({ createdAt: "desc" })
+      .skip(offset)
+      .limit(limit);
+
+    const total = await WaterQualityAfter.countDocuments({
+      userId: userId,
     });
-    return waterQualityAfter;
+
+    return { data: waterQualityAfter, total: total };
   } catch (error) {
     console.error(
       "waterQualityAfter.service getWaterQualityAfter error:",

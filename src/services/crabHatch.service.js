@@ -19,13 +19,26 @@ async function createCrabHatch(crabHatchData) {
   }
 }
 
-async function getCrabHatchAll(userId) {
+async function getCrabHatchAll(userId, query) {
   try {
-    console.log("start crabHatch.service getCrabHatchAll");
+    console.log("start crabHatch.service getCrabHatchAll query:", query);
+
+    const page = parseInt(query?.page || 1);
+    const limit = parseInt(query?.limit || 10);
+    const offset = (page - 1) * limit;
+
     const crabHatches = await CrabHatch.find({
       userId: userId,
+    })
+      .sort({ createdAt: "desc" })
+      .skip(offset)
+      .limit(limit);
+
+    const total = await CrabHatch.countDocuments({
+      userId: userId,
     });
-    return crabHatches;
+
+    return { data: crabHatches, total: total };
   } catch (error) {
     console.error("crabHatch.service getCrabHatchAll error:", error);
     throw error;

@@ -40,13 +40,17 @@ async function createCrabHatch(req, res, next) {
 
 async function getCrabHatch(req, res, next) {
   try {
-    console.log("start getCrabHatch.controller");
+    console.log("start getCrabHatch.controller req query", req?.query);
 
     const userId = req.user.user_id;
 
-    const crabHatches = await crabHatchService.getCrabHatchAll(userId);
+    const crabHatches = await crabHatchService.getCrabHatchAll(
+      userId,
+      req?.query
+    );
     return res.json({
-      data: crabHatches,
+      data: crabHatches.data,
+      total: crabHatches.total,
       status: 200,
     });
   } catch (err) {
