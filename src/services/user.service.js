@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 var jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const FcmTokenDevice = require("../models/fcmTokenDevice.model");
 require("dotenv").config();
 
 async function findByEmail(email) {
@@ -68,8 +69,50 @@ async function login(user) {
   }
 }
 
+async function createFcmToken(userId, fcmToken) {
+  try {
+    console.log(
+      "start user.service createFcmToken userId : ",
+      userId,
+      "fcmToken : ",
+      fcmToken
+    );
+
+    const newFcmTokenDevice = new FcmTokenDevice({ userId, fcmToken });
+    console.log("created new newFcmTokenDevice instance");
+
+    const saveFcmTokenDevice = await newFcmTokenDevice.save();
+    console.log("saved fcmTokenDevice:", saveFcmTokenDevice);
+
+    return saveFcmTokenDevice;
+  } catch (error) {
+    console.error("user.service createFcmToken error:", error);
+    throw error;
+  }
+}
+
+async function removeFcmToken(userId, fcmToken) {
+  try {
+    console.log(
+      "start user.service removeFcmToken userId : ",
+      userId,
+      "fcmToken : ",
+      fcmToken
+    );
+
+    const result = await FcmTokenDevice.deleteOne({ userId, fcmToken });
+
+    return result;
+  } catch (error) {
+    console.error("user.service createFcmToken error:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   findByEmail,
   register,
   login,
+  createFcmToken,
+  removeFcmToken,
 };
