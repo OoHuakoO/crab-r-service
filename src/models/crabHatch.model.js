@@ -17,10 +17,10 @@ const CrabHatchSchema = new mongoose.Schema(
       type: String,
     },
     crabReleaseDate: {
-      type: String,
+      type: Date,
     },
     crabEggScoopDate: {
-      type: String,
+      type: Date,
     },
     createdAt: {
       type: Date,
