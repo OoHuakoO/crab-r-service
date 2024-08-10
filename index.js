@@ -48,11 +48,10 @@ app.use("/crab-hatch", crabHatchRoute);
 
 const getAccessToken = () => {
   return new Promise(function (resolve, reject) {
-    const key = require("./service-account.json");
     const jwtClient = new google.auth.JWT(
-      key.client_email,
+      process.env.CLIENT_EMAIL,
       null,
-      key.private_key,
+      process.env.PRIVATE_KEY_FCM,
       SCOPES,
       null
     );
@@ -71,6 +70,7 @@ cron.schedule("0 6 * * *", async () => {
   const startOfDay = new Date(today);
   const endOfDay = new Date(today);
   endOfDay.setDate(endOfDay.getDate() + 1);
+  console.log(await getAccessToken());
 
   try {
     const crabsToNotify = await crabHatchModel.find({
