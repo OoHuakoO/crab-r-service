@@ -11,6 +11,7 @@ const waterQualityBeforeRoute = require("./src/routes/waterQualityBefore.route")
 const waterQualityAfterRoute = require("./src/routes/waterQualityAfter.route");
 const crabEggColorRoute = require("./src/routes/crabEggColor.route");
 const crabHatchRoute = require("./src/routes/crabHatch.route");
+const notificationRoute = require("./src/routes/notification.route");
 const crabHatchModel = require("./src/models/crabHatch.model");
 const fcmTokenDeviceModel = require("./src/models/fcmTokenDevice.model");
 const notificationHistoryModel = require("./src/models/notificationHistory.model");
@@ -45,6 +46,7 @@ app.use("/water-quality-before", waterQualityBeforeRoute);
 app.use("/water-quality-after", waterQualityAfterRoute);
 app.use("/crab-egg-color", crabEggColorRoute);
 app.use("/crab-hatch", crabHatchRoute);
+app.use("/notification", notificationRoute);
 
 const getAccessToken = () => {
   return new Promise(function (resolve, reject) {
@@ -70,7 +72,6 @@ cron.schedule("0 6 * * *", async () => {
   const startOfDay = new Date(today);
   const endOfDay = new Date(today);
   endOfDay.setDate(endOfDay.getDate() + 1);
-  console.log(await getAccessToken());
 
   try {
     const crabsToNotify = await crabHatchModel.find({
