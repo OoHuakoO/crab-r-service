@@ -2,14 +2,22 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const { google } = require("googleapis");
+const cron = require("node-cron");
 const app = express();
-const port = process.env.PORT || 3000;
 const user = require("./src/routes/user.route");
 const common = require("./src/routes/common.route");
-const waterQualityBefore = require("./src/routes/waterQualityBefore.route");
-const waterQualityAfter = require("./src/routes/waterQualityAfter.route");
-const crabEggColor = require("./src/routes/crabEggColor.route");
-const crabHatch = require("./src/routes/crabHatch.route");
+const waterQualityBeforeRoute = require("./src/routes/waterQualityBefore.route");
+const waterQualityAfterRoute = require("./src/routes/waterQualityAfter.route");
+const crabEggColorRoute = require("./src/routes/crabEggColor.route");
+const crabHatchRoute = require("./src/routes/crabHatch.route");
+const crabHatchModel = require("./src/models/crabHatch.model");
+const fcmTokenDeviceModel = require("./src/models/fcmTokenDevice.model");
+const notificationHistoryModel = require("./src/models/notificationHistory.model");
+
+const port = process.env.PORT || 3000;
+const MESSAGING_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
+const SCOPES = [MESSAGING_SCOPE];
 
 app.use(bodyParser.json());
 app.use(
@@ -33,10 +41,121 @@ db.once("open", () => {
 
 app.use("/user", user);
 app.use("/common", common);
-app.use("/water-quality-before", waterQualityBefore);
-app.use("/water-quality-after", waterQualityAfter);
-app.use("/crab-egg-color", crabEggColor);
-app.use("/crab-hatch", crabHatch);
+app.use("/water-quality-before", waterQualityBeforeRoute);
+app.use("/water-quality-after", waterQualityAfterRoute);
+app.use("/crab-egg-color", crabEggColorRoute);
+app.use("/crab-hatch", crabHatchRoute);
+
+const getAccessToken = () => {
+  return new Promise(function (resolve, reject) {
+    const key = require("./service-account.json");
+    const jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      SCOPES,
+      null
+    );
+    jwtClient.authorize(function (err, tokens) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(tokens.access_token);
+    });
+  });
+};
+
+cron.schedule("0 6 * * *", async () => {
+  const today = new Date().toISOString().split("T")[0];
+  const startOfDay = new Date(today);
+  const endOfDay = new Date(today);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  try {
+    const crabsToNotify = await crabHatchModel.find({
+      $or: [
+        { crabReleaseDate: { $gte: startOfDay, $lt: endOfDay } },
+        { crabEggScoopDate: { $gte: startOfDay, $lt: endOfDay } },
+      ],
+    });
+
+    for (const crab of crabsToNotify) {
+      const crabReleaseDate = crab.crabReleaseDate.toISOString().split("T")[0];
+      const crabEggScoopDate = crab.crabEggScoopDate
+        .toISOString()
+        .split("T")[0];
+
+      const userFcmTokens = await fcmTokenDeviceModel.find({
+        userId: crab.userId,
+      });
+
+      userFcmTokens.forEach(async (tokenDoc) => {
+        let message = {};
+
+        if (crabReleaseDate === today && crabEggScoopDate === today) {
+          message = {
+            message: {
+              notification: {
+                title: "ถึงกำหนดวันเขี่ยไข่ปูและวันปล่อยปูแล้ว",
+                body: `วันที่ : ${today}`,
+              },
+              token: tokenDoc.fcmToken,
+            },
+          };
+        } else if (crabEggScoopDate === today) {
+          message = {
+            message: {
+              notification: {
+                title: "ถึงกำหนดวันเขี่ยไข่ปูแล้ว",
+                body: `วันที่ : ${today}`,
+              },
+              token: tokenDoc.fcmToken,
+            },
+          };
+        } else if (crabReleaseDate === today) {
+          message = {
+            message: {
+              notification: {
+                title: "ถึงกำหนดวันปล่อยปูแล้ว",
+                body: `วันที่ : ${today}`,
+              },
+              token: tokenDoc.fcmToken,
+            },
+          };
+        }
+
+        try {
+          const response = await fetch(
+            "https://fcm.googleapis.com/v1/projects/crab-r/messages:send",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${await getAccessToken()}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(message),
+            }
+          );
+
+          const data = await response.json();
+          if (data?.name) {
+            await notificationHistoryModel.create({
+              userId: tokenDoc?.userId,
+              title: message?.message?.notification?.title,
+              message: message?.message?.notification?.body,
+            });
+            console.log(`Notification sent to ${tokenDoc.fcmToken}`);
+          }
+        } catch (error) {
+          console.error(`Error sending notification: ${error}`);
+        }
+      });
+    }
+  } catch (error) {
+    console.error(`Error fetching data: ${error}`);
+  }
+});
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
