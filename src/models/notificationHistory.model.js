@@ -7,10 +7,21 @@ const NotificationHistorySchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    crabHatchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "crabHatch",
+      required: true,
+    },
     title: {
       type: String,
     },
     message: {
+      type: String,
+    },
+    location: {
+      type: String,
+    },
+    pool: {
       type: String,
     },
     read: {

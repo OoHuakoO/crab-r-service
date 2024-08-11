@@ -15,6 +15,17 @@ async function getHistories(userId, query) {
       .skip(offset)
       .limit(limit);
 
+    const unreadNotificationIds = notificationHistory
+      .filter((doc) => !doc.read)
+      .map((doc) => doc._id);
+
+    if (unreadNotificationIds.length > 0) {
+      await NotificationHistory.updateMany(
+        { _id: { $in: unreadNotificationIds } },
+        { $set: { read: true } }
+      );
+    }
+
     const total = await NotificationHistory.countDocuments({
       userId: userId,
     });

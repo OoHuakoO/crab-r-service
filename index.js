@@ -143,8 +143,11 @@ cron.schedule("0 6 * * *", async () => {
           if (data?.name) {
             await notificationHistoryModel.create({
               userId: tokenDoc?.userId,
+              crabHatchId: crab?._id,
               title: message?.message?.notification?.title,
               message: message?.message?.notification?.body,
+              pool: crab?.pool,
+              location: crab?.location,
             });
             console.log(`Notification sent to ${tokenDoc.fcmToken}`);
           }
