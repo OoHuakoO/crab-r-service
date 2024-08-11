@@ -31,11 +31,7 @@ async function register(email, password) {
       role: "user",
     });
 
-    const token = jwt.sign(
-      { user_id: user._id, email },
-      process.env.TOKEN_KEY,
-      { expiresIn: 0 }
-    );
+    const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY);
 
     user.token = token;
 
