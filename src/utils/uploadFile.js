@@ -15,7 +15,7 @@ const storage = getStorage();
 
 async function compressImage(file) {
   return await sharp(file.buffer)
-    .resize({ width: 500, height: 500 })
+    .resize({ width: 600, height: 600 })
     .toBuffer();
 }
 
