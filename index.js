@@ -144,6 +144,7 @@ cron.schedule("0 6 * * *", async () => {
             await notificationHistoryModel.create({
               userId: tokenDoc?.userId,
               crabHatchId: crab?._id,
+              fcmToken: tokenDoc?.fcmToken,
               title: message?.message?.notification?.title,
               message: message?.message?.notification?.body,
               pool: crab?.pool,

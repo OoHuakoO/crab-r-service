@@ -28,12 +28,14 @@ async function getHistories(req, res, next) {
 
 async function getHistoriesReadCount(req, res, next) {
   try {
-    console.log("start notification.controller getHistoriesReadCount");
+    console.log("start notification.controller getHistoriesReadCount req query", req?.query);
 
     const userId = req.user.user_id;
+    
 
     const totalHistory = await notificationService.getHistoriesReadCount(
-      userId
+      userId,
+      req?.query?.fcmToken
     );
 
     return res.json({
