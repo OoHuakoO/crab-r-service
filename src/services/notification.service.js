@@ -9,7 +9,6 @@ async function getHistories(userId, query) {
     const offset = (page - 1) * limit;
 
     const notificationHistory = await NotificationHistory.find({
-      fcmToken : query?.fcmToken,
       userId: userId,
     })
       .sort({ createdAt: "desc" })
@@ -38,12 +37,11 @@ async function getHistories(userId, query) {
   }
 }
 
-async function getHistoriesReadCount(userId,fcmToken) {
+async function getHistoriesReadCount(userId) {
   try {
     console.log("start notification.service getHistoriesReadCount");
 
     const totalHistory = await NotificationHistory.countDocuments({
-      fcmToken : fcmToken,
       userId: userId,
       read: false,
     });

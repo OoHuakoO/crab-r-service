@@ -34,8 +34,7 @@ async function getHistoriesReadCount(req, res, next) {
     
 
     const totalHistory = await notificationService.getHistoriesReadCount(
-      userId,
-      req?.query?.fcmToken
+      userId
     );
 
     return res.json({
