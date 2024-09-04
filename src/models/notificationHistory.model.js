@@ -12,9 +12,6 @@ const NotificationHistorySchema = new mongoose.Schema(
       ref: "crabHatch",
       required: true,
     },
-    fcmToken: {
-      type: String,
-    },
     title: {
       type: String,
     },

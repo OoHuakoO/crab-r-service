@@ -139,18 +139,27 @@ cron.schedule("0 6 * * *", async () => {
             }
           );
 
-          const data = await response.json();
           if (data?.name) {
-            await notificationHistoryModel.create({
+            // Check if the notification history for this crabHatchId and userId already exists
+            const existingNotification = await notificationHistoryModel.findOne({
               userId: tokenDoc?.userId,
               crabHatchId: crab?._id,
-              fcmToken: tokenDoc?.fcmToken,
-              title: message?.message?.notification?.title,
-              message: message?.message?.notification?.body,
-              pool: crab?.pool,
-              location: crab?.location,
             });
-            console.log(`Notification sent to ${tokenDoc.fcmToken}`);
+
+            // Only create a new history entry if it doesn't already exist
+            if (!existingNotification) {
+              await notificationHistoryModel.create({
+                userId: tokenDoc?.userId,
+                crabHatchId: crab?._id,
+                title: message?.message?.notification?.title,
+                message: message?.message?.notification?.body,
+                pool: crab?.pool,
+                location: crab?.location,
+              });
+              console.log(`Notification sent to ${tokenDoc.fcmToken}`);
+            } else {
+              console.log(`Notification already exists for ${crab?._id}`);
+            }
           }
         } catch (error) {
           console.error(`Error sending notification: ${error}`);
