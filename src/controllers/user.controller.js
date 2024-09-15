@@ -89,22 +89,17 @@ async function removeFcmToken(req, res, next) {
 
     const userId = req.user.user_id;
 
-    if (!(fcmToken && userId)) {
-      return res.json({
-        data: "fcmToken and userId are required",
-        status: 400,
-      });
+    if(fcmToken && userId){
+      const resultRemove = await userService.removeFcmToken(userId, fcmToken);
+
+      if (resultRemove.deletedCount === 0) {
+        return res.json({ data: "fcmToken not found", status: 404 });
+      }
+
+      console.log(`Successfully removed fcmToken ${fcmToken} for user ${userId}`);
+      return  res.json({ data: "fcmToken removed successfully", status: 200 });
     }
-
-    const resultRemove = await userService.removeFcmToken(userId, fcmToken);
-
-    if (resultRemove.deletedCount === 0) {
-      return res.json({ data: "fcmToken not found", status: 404 });
-    }
-
-    console.log(`Successfully removed fcmToken ${fcmToken} for user ${userId}`);
-
-    res.json({ data: "fcmToken removed successfully", status: 200 });
+    return res.json({ data: "some input not found", status: 200 });
   } catch (err) {
     console.error(
       `removeFcmToken.controller error while removeFcmToken`,
