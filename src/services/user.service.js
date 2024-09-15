@@ -74,6 +74,14 @@ async function createFcmToken(userId, fcmToken) {
       fcmToken
     );
 
+    // Check if a document with the same userId and fcmToken already exists
+    const existingFcmTokenDevice = await FcmTokenDevice.findOne({ userId, fcmToken });
+
+    if (existingFcmTokenDevice) {
+      console.log("FcmTokenDevice already exists:", existingFcmTokenDevice);
+      return existingFcmTokenDevice; // Return the existing document
+    }
+
     const newFcmTokenDevice = new FcmTokenDevice({ userId, fcmToken });
     console.log("created new newFcmTokenDevice instance");
 
@@ -86,6 +94,7 @@ async function createFcmToken(userId, fcmToken) {
     throw error;
   }
 }
+
 
 async function removeFcmToken(userId, fcmToken) {
   try {

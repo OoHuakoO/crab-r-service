@@ -6,7 +6,7 @@ async function register(req, res, next) {
   try {
     console.log("start register.controller  req body :", req?.body);
 
-    const { email, password } = req?.body;
+    const { email, password, fcmToken } = req?.body;
 
     if (!(email && password)) {
       return res.json({
@@ -23,6 +23,10 @@ async function register(req, res, next) {
       });
     }
     const userRegister = await userService.register(email, password);
+
+    if(fcmToken){
+      await userService.createFcmToken(userRegister._id, fcmToken);
+    }
 
     return res.json({
       data: userRegister,
@@ -42,7 +46,7 @@ async function login(req, res, next) {
       JSON.stringify(req?.body, null, 2)
     );
 
-    const { email, password } = req?.body;
+    const { email, password, fcmToken } = req?.body;
 
     if (!(email && password)) {
       return res.json({
@@ -54,6 +58,9 @@ async function login(req, res, next) {
     const user = await userService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       const userLogin = await userService.login(user);
+      if(fcmToken){
+        await userService.createFcmToken(userLogin._id, fcmToken);
+      }
       return res.json({
         data: userLogin,
         status: 200,
