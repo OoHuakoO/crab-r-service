@@ -7,6 +7,6 @@ router.get("/location", commonController.getLocation);
 router.get("/pool", commonController.getPool);
 router.post("/location", commonController.createLocation);
 router.post("/pool", commonController.createPool);
-router.post('/createFcmToken',  verifyToken, commonController.createFcmToken)
+router.post("/createFcmToken",  verifyToken, commonController.createFcmToken)
 
 module.exports = router;
