@@ -1,4 +1,5 @@
 const commonService = require("../services/common.service");
+const userService = require("../services/user.service");
 
 async function createLocation(req, res, next) {
   try {
@@ -98,9 +99,31 @@ async function getPool(req, res, next) {
   }
 }
 
+
+async function createFcmToken(req, res, next) {
+  try {
+    console.log("start createFcmToken.controller  req body :", req?.body);
+    const { fcmToken } = req?.body;
+
+    const userId = req.user.user_id;
+
+    if(fcmToken && userId){
+      await userService.createFcmToken(userId,fcmToken); 
+      return res.json({ data: "create fcmToken successfully", status: 200 });
+    }
+    return res.json({ data: "some input not found", status: 200 });
+  } catch (err) {
+    console.error(`createFcmToken.controller error:`, err.message);
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
+
 module.exports = {
   createLocation,
   getLocation,
   createPool,
   getPool,
+  createFcmToken
 };
