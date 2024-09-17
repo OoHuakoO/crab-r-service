@@ -94,14 +94,14 @@ async function createFcmToken(userId, fcmToken,platform = 'android') {
 }
 
 
-async function removeFcmToken(userId, fcmToken) {
+async function removeFcmToken(userId, fcmToken,platform) {
   try {
     console.log(
       "start user.service removeFcmToken fcmToken : ",
       fcmToken
     );
 
-    const result = await FcmTokenDevice.deleteOne({ userId, fcmToken });
+    const result = await FcmTokenDevice.deleteOne({ userId, fcmToken,platform });
 
     return result;
   } catch (error) {
