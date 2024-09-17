@@ -117,7 +117,7 @@ async function removeUser(userId) {
       "start user.service removeUser"
     );
 
-    const result = await User.deleteOne({ userId });
+    const result = await User.deleteOne({ _id: userId });
 
     return result;
   } catch (error) {
