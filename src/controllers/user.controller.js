@@ -85,12 +85,12 @@ async function removeFcmToken(req, res, next) {
       JSON.stringify(req?.body, null, 2)
     );
 
-    const { fcmToken } = req.body;
+    const { fcmToken,platform } = req.body;
 
     const userId = req.user.user_id;
 
     if(fcmToken && userId){
-      const resultRemove = await userService.removeFcmToken(userId, fcmToken);
+      const resultRemove = await userService.removeFcmToken(userId, fcmToken,platform);
 
       if (resultRemove.deletedCount === 0) {
         return res.json({ data: "fcmToken not found", status: 404 });
