@@ -6,7 +6,7 @@ async function register(req, res, next) {
   try {
     console.log("start register.controller  req body :", req?.body);
 
-    const { email, password, fcmToken } = req?.body;
+    const { email, password, fcmToken , platform } = req?.body;
 
     if (!(email && password)) {
       return res.json({
@@ -25,7 +25,7 @@ async function register(req, res, next) {
     const userRegister = await userService.register(email, password);
 
     if(fcmToken){
-      await userService.createFcmToken(userRegister._id, fcmToken);
+      await userService.createFcmToken(userRegister._id, fcmToken,platform);
     }
 
     return res.json({
