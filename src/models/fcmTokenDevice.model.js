@@ -10,6 +10,9 @@ const FcmTokenDeviceSchema = new mongoose.Schema(
     fcmToken: {
       type: String,
     },
+    platform : {
+      type: String,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

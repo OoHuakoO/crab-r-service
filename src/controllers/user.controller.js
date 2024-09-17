@@ -46,7 +46,7 @@ async function login(req, res, next) {
       JSON.stringify(req?.body, null, 2)
     );
 
-    const { email, password, fcmToken } = req?.body;
+    const { email, password, fcmToken , platform } = req?.body;
 
     if (!(email && password)) {
       return res.json({
@@ -59,7 +59,7 @@ async function login(req, res, next) {
     if (user && (await bcrypt.compare(password, user.password))) {
       const userLogin = await userService.login(user);
       if(fcmToken){
-        await userService.createFcmToken(userLogin._id, fcmToken);
+        await userService.createFcmToken(userLogin._id, fcmToken,platform);
       }
       return res.json({
         data: userLogin,
@@ -96,7 +96,7 @@ async function removeFcmToken(req, res, next) {
         return res.json({ data: "fcmToken not found", status: 404 });
       }
 
-      console.log(`Successfully removed fcmToken ${fcmToken} for user ${userId}`);
+      console.log(`successfully removed fcmToken ${fcmToken} for user ${userId}`);
       return  res.json({ data: "fcmToken removed successfully", status: 200 });
     }
     return res.json({ data: "some input not found", status: 200 });
@@ -110,8 +110,49 @@ async function removeFcmToken(req, res, next) {
   }
 }
 
+
+async function removeUser(req, res, next) {
+  try {
+    console.log(
+      "start removeUser.controller req body :",
+      JSON.stringify(req?.body, null, 2)
+    );
+
+    const { fcmToken } = req.body;
+
+    const userId = req.user.user_id;
+
+    if(fcmToken && userId){
+      const resultRemove = await userService.removeFcmToken(userId, fcmToken);
+
+      if (resultRemove.deletedCount === 0) {
+        return res.json({ data: "fcmToken not found", status: 404 });
+      }
+
+      const resultRemoveUser = await userService.removeUser(userId);
+
+      if (resultRemoveUser.deletedCount === 0) {
+        return res.json({ data: "user not found", status: 404 });
+      }
+
+      console.log(`successfully removed fcmToken ${fcmToken} for user ${userId}`);
+      return  res.json({ data: "fcmToken and user removed successfully", status: 200 });
+    }
+    return res.json({ data: "some input not found", status: 200 });
+  } catch (err) {
+    console.error(
+      `removeUser.controller error while removeUser`,
+      err.message
+    );
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
+
 module.exports = {
   register,
   login,
   removeFcmToken,
+  removeUser
 };

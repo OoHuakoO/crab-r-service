@@ -103,12 +103,12 @@ async function getPool(req, res, next) {
 async function createFcmToken(req, res, next) {
   try {
     console.log("start createFcmToken.controller  req body :", req?.body);
-    const { fcmToken } = req?.body;
+    const { fcmToken ,platform} = req?.body;
 
     const userId = req.user.user_id;
 
     if(fcmToken && userId){
-      await userService.createFcmToken(userId,fcmToken); 
+      await userService.createFcmToken(userId,fcmToken,platform); 
       return res.json({ data: "create fcmToken successfully", status: 200 });
     }
     return res.json({ data: "some input not found", status: 200 });

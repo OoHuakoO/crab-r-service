@@ -65,24 +65,22 @@ async function login(user) {
   }
 }
 
-async function createFcmToken(userId, fcmToken) {
+async function createFcmToken(userId, fcmToken,platform = 'android') {
   try {
     console.log(
-      "start user.service createFcmToken userId : ",
-      userId,
-      "fcmToken : ",
+      "start user.service createFcmToken fcmToken : ",
       fcmToken
     );
 
-    // Check if a document with the same userId and fcmToken already exists
-    const existingFcmTokenDevice = await FcmTokenDevice.findOne({ userId, fcmToken });
+    // Check if a document with the same userId and fcmToken  and  platform already exists
+    const existingFcmTokenDevice = await FcmTokenDevice.findOne({ userId, fcmToken,platform });
 
     if (existingFcmTokenDevice) {
       console.log("FcmTokenDevice already exists:", existingFcmTokenDevice);
       return existingFcmTokenDevice; // Return the existing document
     }
 
-    const newFcmTokenDevice = new FcmTokenDevice({ userId, fcmToken });
+    const newFcmTokenDevice = new FcmTokenDevice({ userId, fcmToken , platform });
     console.log("created new newFcmTokenDevice instance");
 
     const saveFcmTokenDevice = await newFcmTokenDevice.save();
@@ -99,9 +97,7 @@ async function createFcmToken(userId, fcmToken) {
 async function removeFcmToken(userId, fcmToken) {
   try {
     console.log(
-      "start user.service removeFcmToken userId : ",
-      userId,
-      "fcmToken : ",
+      "start user.service removeFcmToken fcmToken : ",
       fcmToken
     );
 
@@ -109,7 +105,23 @@ async function removeFcmToken(userId, fcmToken) {
 
     return result;
   } catch (error) {
-    console.error("user.service createFcmToken error:", error);
+    console.error("user.service removeFcmToken error:", error);
+    throw error;
+  }
+}
+
+
+async function removeUser(userId) {
+  try {
+    console.log(
+      "start user.service removeUser"
+    );
+
+    const result = await User.deleteOne({ userId });
+
+    return result;
+  } catch (error) {
+    console.error("user.service removeUser error:", error);
     throw error;
   }
 }
@@ -120,4 +132,5 @@ module.exports = {
   login,
   createFcmToken,
   removeFcmToken,
+  removeUser
 };

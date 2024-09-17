@@ -9,4 +9,6 @@ router.post("/login", userController.login);
 
 router.post("/remove-fcm-token", verifyToken, userController.removeFcmToken);
 
+router.post("/removeUser", verifyToken, userController.removeUser);
+
 module.exports = router;
