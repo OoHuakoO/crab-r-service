@@ -65,22 +65,27 @@ async function login(user) {
   }
 }
 
-async function createFcmToken(userId, fcmToken,platform = 'android') {
+async function createFcmToken(userId, fcmToken, platform = "android") {
   try {
-    console.log(
-      "start user.service createFcmToken fcmToken : ",
-      fcmToken
-    );
+    console.log("start user.service createFcmToken fcmToken : ", fcmToken);
 
     // Check if a document with the same userId and fcmToken  and  platform already exists
-    const existingFcmTokenDevice = await FcmTokenDevice.findOne({ userId, fcmToken,platform });
+    const existingFcmTokenDevice = await FcmTokenDevice.findOne({
+      userId,
+      fcmToken,
+      platform,
+    });
 
     if (existingFcmTokenDevice) {
       console.log("FcmTokenDevice already exists:", existingFcmTokenDevice);
       return existingFcmTokenDevice; // Return the existing document
     }
 
-    const newFcmTokenDevice = new FcmTokenDevice({ userId, fcmToken , platform });
+    const newFcmTokenDevice = new FcmTokenDevice({
+      userId,
+      fcmToken,
+      platform,
+    });
     console.log("created new newFcmTokenDevice instance");
 
     const saveFcmTokenDevice = await newFcmTokenDevice.save();
@@ -93,15 +98,15 @@ async function createFcmToken(userId, fcmToken,platform = 'android') {
   }
 }
 
-
-async function removeFcmToken(userId, fcmToken,platform) {
+async function removeFcmToken(userId, fcmToken, platform = "android") {
   try {
-    console.log(
-      "start user.service removeFcmToken fcmToken : ",
-      fcmToken
-    );
+    console.log("start user.service removeFcmToken fcmToken : ", fcmToken);
 
-    const result = await FcmTokenDevice.deleteOne({ userId, fcmToken,platform });
+    const result = await FcmTokenDevice.deleteOne({
+      userId,
+      fcmToken,
+      platform,
+    });
 
     return result;
   } catch (error) {
@@ -110,12 +115,9 @@ async function removeFcmToken(userId, fcmToken,platform) {
   }
 }
 
-
 async function removeUser(userId) {
   try {
-    console.log(
-      "start user.service removeUser"
-    );
+    console.log("start user.service removeUser");
 
     const result = await User.deleteOne({ _id: userId });
 
@@ -132,5 +134,5 @@ module.exports = {
   login,
   createFcmToken,
   removeFcmToken,
-  removeUser
+  removeUser,
 };
