@@ -139,12 +139,16 @@ cron.schedule("0 6 * * *", async () => {
             }
           );
 
+          const data = await response.json();
+
           if (data?.name) {
             // Check if the notification history for this crabHatchId and userId already exists
-            const existingNotification = await notificationHistoryModel.findOne({
-              userId: tokenDoc?.userId,
-              crabHatchId: crab?._id,
-            });
+            const existingNotification = await notificationHistoryModel.findOne(
+              {
+                userId: tokenDoc?.userId,
+                crabHatchId: crab?._id,
+              }
+            );
 
             // Only create a new history entry if it doesn't already exist
             if (!existingNotification) {
