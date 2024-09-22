@@ -10,9 +10,6 @@ const WaterQualityBeforeSchema = new mongoose.Schema(
     location: {
       type: String,
     },
-    pool: {
-      type: String,
-    },
     salinity: {
       type: String,
     },

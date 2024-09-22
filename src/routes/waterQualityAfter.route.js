@@ -9,6 +9,7 @@ router.post(
   "/createWaterQualityAfter",
   verifyToken,
   upload.fields([
+    { name: "chlorineImg", maxCount: 1 },
     { name: "ammoniaImg", maxCount: 1 },
     { name: "calciumImg", maxCount: 1 },
     { name: "magnesiumImg", maxCount: 1 },

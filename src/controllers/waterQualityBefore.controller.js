@@ -12,11 +12,11 @@ async function createWaterQualityBefore(req, res, next) {
       req?.files
     );
 
-    const { location, pool, salinity, ph, alkaline } = req.body;
+    const { location, salinity, ph, alkaline } = req.body;
     const { salinityImg, phImg, alkalineImg } = req.files;
     const userId = req.user.user_id;
 
-    if (!(location && pool && salinity && ph && alkaline)) {
+    if (!(location &&  salinity && ph && alkaline)) {
       return res.json({
         data: "All input is required",
         status: 400,
@@ -39,7 +39,6 @@ async function createWaterQualityBefore(req, res, next) {
     const waterQualityBefore = {
       userId,
       location,
-      pool,
       salinity,
       ph,
       alkaline,

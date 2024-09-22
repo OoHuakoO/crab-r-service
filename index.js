@@ -70,108 +70,111 @@ const getAccessToken = () => {
 };
 
 cron.schedule("0 6 * * *", async () => {
-  const today = new Date().toISOString().split("T")[0];
-  const startOfDay = new Date(today);
-  const endOfDay = new Date(today);
-  endOfDay.setDate(endOfDay.getDate() + 1);
-
   try {
-    const crabsToNotify = await crabHatchModel.find({
-      $or: [
-        { crabReleaseDate: { $gte: startOfDay, $lt: endOfDay } },
-        { crabEggScoopDate: { $gte: startOfDay, $lt: endOfDay } },
-      ],
-    });
+    const today = new Date().toISOString().split("T")[0];
+    const crabsToNotify = await crabHatchModel.find();
 
     for (const crab of crabsToNotify) {
-      const crabReleaseDate = crab.crabReleaseDate.toISOString().split("T")[0];
-      const crabEggScoopDate = crab.crabEggScoopDate
-        .toISOString()
-        .split("T")[0];
+      let crabEggScoopDateObj = new Date(crab.crabEggScoopDate);
 
-      const userFcmTokens = await fcmTokenDeviceModel.find({
-        userId: crab.userId,
-      });
+      // Adjust crabEggScoopDate based on the egg color
+      switch (crab.crabEggColor) {
+        case 'black':
+          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 1);
+          break;
+        case 'grey':
+          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 2);
+          break;
+        case 'brown':
+          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 3);
+          break;
+        case 'yellow':
+          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 5);
+          break;
+        default:
+          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 1);
+          break;
+      }
 
-      userFcmTokens.forEach(async (tokenDoc) => {
-        let message = {};
+      const crabEggScoopDate = crabEggScoopDateObj.toISOString().split("T")[0];
 
-        if (crabReleaseDate === today && crabEggScoopDate === today) {
-          message = {
-            message: {
-              notification: {
-                title: "ถึงกำหนดวันเขี่ยไข่ปูและวันปล่อยปูแล้ว",
-                body: `วันที่ : ${today}`,
-              },
-              token: tokenDoc.fcmToken,
-            },
-          };
-        } else if (crabEggScoopDate === today) {
-          message = {
-            message: {
-              notification: {
-                title: "ถึงกำหนดวันเขี่ยไข่ปูแล้ว",
-                body: `วันที่ : ${today}`,
-              },
-              token: tokenDoc.fcmToken,
-            },
-          };
-        } else if (crabReleaseDate === today) {
-          message = {
-            message: {
-              notification: {
-                title: "ถึงกำหนดวันปล่อยปูแล้ว",
-                body: `วันที่ : ${today}`,
-              },
-              token: tokenDoc.fcmToken,
-            },
-          };
-        }
+      if (crabEggScoopDate === today) {
+        const userFcmTokens = await fcmTokenDeviceModel.find({
+          userId: crab.userId,
+        });
 
-        try {
-          const response = await fetch(
-            "https://fcm.googleapis.com/v1/projects/crab-r/messages:send",
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${await getAccessToken()}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(message),
+        // Send notifications to all FCM tokens linked to the user
+        for (const tokenDoc of userFcmTokens) {
+          const message = createNotificationMessage(tokenDoc.fcmToken, crab?.pool);
+
+          try {
+            const response = await sendFcmMessage(message);
+
+            if (response?.name) {
+              await saveNotificationHistory(tokenDoc.userId, crab, message);
             }
-          );
-
-          if (data?.name) {
-            // Check if the notification history for this crabHatchId and userId already exists
-            const existingNotification = await notificationHistoryModel.findOne({
-              userId: tokenDoc?.userId,
-              crabHatchId: crab?._id,
-            });
-
-            // Only create a new history entry if it doesn't already exist
-            if (!existingNotification) {
-              await notificationHistoryModel.create({
-                userId: tokenDoc?.userId,
-                crabHatchId: crab?._id,
-                title: message?.message?.notification?.title,
-                message: message?.message?.notification?.body,
-                pool: crab?.pool,
-                location: crab?.location,
-              });
-              console.log(`Notification sent to ${tokenDoc.fcmToken}`);
-            } else {
-              console.log(`Notification already exists for ${crab?._id}`);
-            }
+          } catch (error) {
+            console.error(`Error sending notification : ${error}`);
           }
-        } catch (error) {
-          console.error(`Error sending notification: ${error}`);
         }
-      });
+      }
     }
   } catch (error) {
-    console.error(`Error fetching data: ${error}`);
+    console.error(`Error cronjob : ${error}`);
   }
 });
+
+// Helper function to create the notification message
+const createNotificationMessage = (fcmToken, pool) => {
+  return {
+    message: {
+      notification: {
+        title: "Crab R",
+        body: `ปล่อยปูบ่อที่ ${pool}`,
+      },
+      token: fcmToken,
+    },
+  };
+};
+
+// Helper function to send the FCM message
+const sendFcmMessage = async (message) => {
+  const response = await fetch(
+    "https://fcm.googleapis.com/v1/projects/crab-r/messages:send",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${await getAccessToken()}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    }
+  );
+  return await response.json();
+};
+
+// Helper function to save the notification history
+const saveNotificationHistory = async (userId, crab, message) => {
+  const existingNotification = await notificationHistoryModel.findOne({
+    userId: userId,
+    crabHatchId: crab._id,
+  });
+
+  if (!existingNotification) {
+    await notificationHistoryModel.create({
+      userId: userId,
+      crabHatchId: crab._id,
+      title: message?.message?.notification?.title,
+      message: message?.message?.notification?.body,
+      pool: crab?.pool,
+      location: crab?.location,
+    });
+    console.log(`Notification sent to ${userId}`);
+  } else {
+    console.log(`Notification already exists for ${crab._id}`);
+  }
+};
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

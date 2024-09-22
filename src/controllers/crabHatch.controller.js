@@ -3,12 +3,12 @@ const crabHatchService = require("../services/crabHatch.service");
 async function createCrabHatch(req, res, next) {
   try {
     console.log("start createCrabHatch.controller req body:", req?.body);
-    const { location, pool, crabEggColor, crabReleaseDate, crabEggScoopDate } =
+    const { location, pool, crabEggColor,crabEggScoopDate } =
       req?.body;
     const userId = req.user.user_id;
 
     if (
-      !(location && pool && crabEggColor && crabReleaseDate && crabEggScoopDate)
+      !(location && pool && crabEggColor  && crabEggScoopDate)
     ) {
       return res.json({
         data: "all input is required",
@@ -21,7 +21,6 @@ async function createCrabHatch(req, res, next) {
       location,
       pool,
       crabEggColor,
-      crabReleaseDate,
       crabEggScoopDate,
     };
 
