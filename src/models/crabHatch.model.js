@@ -16,10 +16,10 @@ const CrabHatchSchema = new mongoose.Schema(
     crabEggColor: {
       type: String,
     },
-    crabReleaseDate: {
+    crabEggScoopDate: {
       type: Date,
     },
-    crabEggScoopDate: {
+    crabReleaseDate: {
       type: Date,
     },
     createdAt: {

@@ -10,7 +10,7 @@ const WaterQualityAfterSchema = new mongoose.Schema(
     location: {
       type: String,
     },
-    pool: {
+    chlorine: {
       type: String,
     },
     ammonia: {
@@ -23,6 +23,9 @@ const WaterQualityAfterSchema = new mongoose.Schema(
       type: String,
     },
     ammoniaImg: {
+      type: String,
+    },
+    chlorineImg: {
       type: String,
     },
     calciumImg: {

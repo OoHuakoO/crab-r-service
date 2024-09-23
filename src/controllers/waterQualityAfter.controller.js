@@ -12,20 +12,25 @@ async function createWaterQualityAfter(req, res, next) {
       req?.files
     );
 
-    const { location, pool, ammonia, calcium, magnesium } = req.body;
-    const { ammoniaImg, calciumImg, magnesiumImg } = req.files;
+    const { location, chlorine, ammonia, calcium, magnesium } = req.body;
+    const { chlorineImg, ammoniaImg, calciumImg, magnesiumImg } = req.files;
     const userId = req.user.user_id;
 
-    if (!(location && pool && ammonia && calcium && magnesium)) {
+    if (!(location  && chlorine && ammonia && calcium && magnesium)) {
       return res.json({
         data: "All input is required",
         status: 400,
       });
     }
-
+    
+    let chlorineImgUrl;
     let ammoniaImgUrl;
     let calciumImgUrl;
     let magnesiumImgUrl;
+
+    if (chlorineImg && chlorineImg.length > 0) {
+      chlorineImgUrl = await uploadFileFirebase(chlorineImg[0]);
+    }
     if (ammoniaImg && ammoniaImg.length > 0) {
       ammoniaImgUrl = await uploadFileFirebase(ammoniaImg[0]);
     }
@@ -35,17 +40,18 @@ async function createWaterQualityAfter(req, res, next) {
     if (magnesiumImg && magnesiumImg.length > 0) {
       magnesiumImgUrl = await uploadFileFirebase(magnesiumImg[0]);
     }
-
+   
     const waterQualityAfter = {
       userId,
       location,
-      pool,
+      chlorine,
       ammonia,
       calcium,
       magnesium,
       ammoniaImg: ammoniaImgUrl,
       calciumImg: calciumImgUrl,
       magnesiumImg: magnesiumImgUrl,
+      chlorineImg: chlorineImgUrl
     };
 
     const saveWaterQualityAfter =
