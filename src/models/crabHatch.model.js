@@ -19,6 +19,9 @@ const CrabHatchSchema = new mongoose.Schema(
     crabEggScoopDate: {
       type: Date,
     },
+    crabReleaseDate: {
+      type: Date,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

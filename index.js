@@ -68,112 +68,107 @@ const getAccessToken = () => {
     });
   });
 };
-
 cron.schedule("0 6 * * *", async () => {
+  const today = new Date().toISOString().split("T")[0];
+  const startOfDay = new Date(today);
+  const endOfDay = new Date(today);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
   try {
-    const today = new Date().toISOString().split("T")[0];
-    const crabsToNotify = await crabHatchModel.find();
-
-    for (const crab of crabsToNotify) {
-      let crabEggScoopDateObj = new Date(crab.crabEggScoopDate);
-
-      // Adjust crabEggScoopDate based on the egg color
-      switch (crab.crabEggColor) {
-        case 'ดำ (1 วัน)':
-          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 1);
-          break;
-        case 'เทา (2 วัน)':
-          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 2);
-          break;
-        case 'น้ำตาล (3 วัน)':
-          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 3);
-          break;
-        case 'เหลือง-ส้ม (5 วัน)':
-          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 5);
-          break;
-        default:
-          crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 1);
-          break;
-      }
-
-      const crabEggScoopDate = crabEggScoopDateObj.toISOString().split("T")[0];
-
-      if (crabEggScoopDate === today) {
-        const userFcmTokens = await fcmTokenDeviceModel.find({
-          userId: crab.userId,
-        });
-
-        // Send notifications to all FCM tokens linked to the user
-        for (const tokenDoc of userFcmTokens) {
-          const message = createNotificationMessage(tokenDoc.fcmToken, crab?.pool);
-
-          try {
-            const response = await sendFcmMessage(message);
-
-            if (response?.name) {
-              await saveNotificationHistory(tokenDoc.userId, crab, message);
-            }
-          } catch (error) {
-            console.error(`Error sending notification : ${error}`);
-          }
-        }
-      }
+    const crabsToNotify = await getCrabsToNotify(startOfDay, endOfDay);
+    if (crabsToNotify.length > 0) {
+      await notifyUsers(crabsToNotify);
+    } else {
+      console.log('No crabs to notify today.');
     }
   } catch (error) {
-    console.error(`Error cronjob : ${error}`);
+    console.error(`Error fetching data: ${error}`);
   }
 });
 
-// Helper function to create the notification message
-const createNotificationMessage = (fcmToken, pool) => {
+// Function to fetch crabs that need to be notified
+async function getCrabsToNotify(startOfDay, endOfDay) {
+  return await crabHatchModel.find({
+    crabReleaseDate: { $gte: startOfDay, $lt: endOfDay },
+  });
+}
+
+// Function to handle user notification
+async function notifyUsers(crabsToNotify) {
+  for (const crab of crabsToNotify) {
+    try {
+      const userFcmTokens = await fcmTokenDeviceModel.find({
+        userId: crab.userId,
+      });
+
+      await Promise.all(userFcmTokens.map(async (tokenDoc) => {
+        const message = createMessage(crab, tokenDoc);
+        await sendNotification(message, tokenDoc, crab);
+      }));
+    } catch (error) {
+      console.error(`Error processing crab: ${crab._id}, ${error}`);
+    }
+  }
+}
+
+// Function to create the message payload
+function createMessage(crab, tokenDoc) {
   return {
     message: {
       notification: {
         title: "Crab R",
-        body: `ปล่อยปูบ่อที่ ${pool}`,
+        body: `ปล่อยปูบ่อที่ ${crab.pool}`,
       },
-      token: fcmToken,
+      token: tokenDoc.fcmToken,
     },
   };
-};
+}
 
-// Helper function to send the FCM message
-const sendFcmMessage = async (message) => {
-  const response = await fetch(
-    "https://fcm.googleapis.com/v1/projects/crab-r/messages:send",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${await getAccessToken()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(message),
+// Function to send notification and save to history if successful
+async function sendNotification(message, tokenDoc, crab) {
+  try {
+    const response = await fetch(
+      "https://fcm.googleapis.com/v1/projects/crab-r/messages:send",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+      }
+    );
+    const data = await response.json();
+
+    if (data?.name) {
+      await saveNotificationHistory(tokenDoc, crab, message);
+      console.log(`Notification sent to ${tokenDoc.fcmToken}`);
     }
-  );
-  return await response.json();
-};
+  } catch (error) {
+    console.error(`Error sending notification to ${tokenDoc.fcmToken}: ${error}`);
+  }
+}
 
-// Helper function to save the notification history
-const saveNotificationHistory = async (userId, crab, message) => {
+// Function to save notification history if not already exists
+async function saveNotificationHistory(tokenDoc, crab, message) {
   const existingNotification = await notificationHistoryModel.findOne({
-    userId: userId,
-    crabHatchId: crab._id,
+    userId: tokenDoc?.userId,
+    crabHatchId: crab?._id,
   });
 
   if (!existingNotification) {
     await notificationHistoryModel.create({
-      userId: userId,
-      crabHatchId: crab._id,
+      userId: tokenDoc?.userId,
+      crabHatchId: crab?._id,
       title: message?.message?.notification?.title,
       message: message?.message?.notification?.body,
       pool: crab?.pool,
       location: crab?.location,
     });
-    console.log(`Notification sent to ${userId}`);
   } else {
     console.log(`Notification already exists for ${crab._id}`);
   }
-};
+}
 
 
 app.use((err, req, res, next) => {
