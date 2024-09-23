@@ -29,7 +29,7 @@ async function createWaterQualityAfter(req, res, next) {
     let magnesiumImgUrl;
 
     if (chlorineImg && chlorineImg.length > 0) {
-      magnesiumImgUrl = await uploadFileFirebase(magnesiumImg[0]);
+      chlorineImgUrl = await uploadFileFirebase(chlorineImg[0]);
     }
     if (ammoniaImg && ammoniaImg.length > 0) {
       ammoniaImgUrl = await uploadFileFirebase(ammoniaImg[0]);
