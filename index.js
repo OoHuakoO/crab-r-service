@@ -79,16 +79,16 @@ cron.schedule("0 6 * * *", async () => {
 
       // Adjust crabEggScoopDate based on the egg color
       switch (crab.crabEggColor) {
-        case 'black':
+        case 'ดำ (1 วัน)':
           crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 1);
           break;
-        case 'grey':
+        case 'เทา (2 วัน)':
           crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 2);
           break;
-        case 'brown':
+        case 'น้ำตาล (3 วัน)':
           crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 3);
           break;
-        case 'yellow':
+        case 'เหลือง-ส้ม (5 วัน)':
           crabEggScoopDateObj.setDate(crabEggScoopDateObj.getDate() + 5);
           break;
         default:
