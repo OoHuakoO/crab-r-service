@@ -27,13 +27,13 @@ app.use(
   })
 );
 
-// mongoose.connect(process.env.MONGODB_URI, {
-//   dbName: process.env.DB_NAME,
-//   user: process.env.USER_DB,
-//   pass: process.env.PASS_DB,
-// });
+mongoose.connect(process.env.MONGODB_URI, {
+  dbName: process.env.DB_NAME,
+  user: process.env.USER_DB,
+  pass: process.env.PASS_DB,
+});
 
-mongoose.connect('mongodb://127.0.0.1:27017/crab-r');
+// mongoose.connect('mongodb://127.0.0.1:27017/crab-r');
 
 const db = mongoose.connection;
 
@@ -68,6 +68,7 @@ const getAccessToken = () => {
     });
   });
 };
+
 cron.schedule("0 6 * * *", async () => {
   const today = new Date().toISOString().split("T")[0];
   const startOfDay = new Date(today);
