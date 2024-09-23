@@ -55,7 +55,7 @@ const getAccessToken = () => {
     const jwtClient = new google.auth.JWT(
       process.env.CLIENT_EMAIL,
       null,
-      process.env.PRIVATE_KEY_FCM,
+      process.env.PRIVATE_KEY_FCM.replace(/\\n/g, '\n'),
       SCOPES,
       null
     );
@@ -101,7 +101,6 @@ async function notifyUsers(crabsToNotify) {
       const userFcmTokens = await fcmTokenDeviceModel.find({
         userId: crab.userId,
       });
-
       await Promise.all(userFcmTokens.map(async (tokenDoc) => {
         const message = createMessage(crab, tokenDoc);
         await sendNotification(message, tokenDoc, crab);
