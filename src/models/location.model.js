@@ -6,6 +6,10 @@ const LocationSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { versionKey: false }
 );

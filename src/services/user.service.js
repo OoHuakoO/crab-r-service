@@ -1,7 +1,9 @@
-const User = require("../models/user.model");
 var jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer'); 
 const FcmTokenDevice = require("../models/fcmTokenDevice.model");
+const User = require("../models/user.model");
 require("dotenv").config();
 
 async function findByEmail(email) {
@@ -13,7 +15,7 @@ async function findByEmail(email) {
     return user;
   } catch (error) {
     console.error(
-      "customerProfile.service findByIDCard customer profile:",
+      "login.service error findByEmail:",
       error
     );
     throw error;
@@ -128,6 +130,41 @@ async function removeUser(userId) {
   }
 }
 
+async function forgetPassword(user) {
+  try {
+    console.log("start user.service forgetPassword");
+
+     const resetToken = crypto.randomBytes(32).toString('hex');
+     user.resetToken = resetToken;
+     user.resetTokenExpiry = Date.now() + 3600000; // Token หมดอายุภายใน 1 ชั่วโมง
+ 
+     await user.save();
+ 
+     const transporter = nodemailer.createTransport({
+       service: 'gmail', 
+       auth: {
+         user: process.env.EMAIL_SENDER,
+         pass: process.env.PASSWORD_SENDER,
+       },
+     });
+ 
+     const mailOptions = {
+       to: user.email,
+       from: process.env.EMAIL_SENDER,
+       subject: 'Reset Password',
+       text: `กดที่ลิงก์เพื่อตั้งรหัสผ่านใหม่: \n \n
+       http://localhost:3000/reset-password/${resetToken}`,
+     };
+ 
+     await transporter.sendMail(mailOptions);
+
+    return true;
+  } catch (error) {
+    console.error("user.service removeUser error:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   findByEmail,
   register,
@@ -135,4 +172,5 @@ module.exports = {
   createFcmToken,
   removeFcmToken,
   removeUser,
+  forgetPassword
 };

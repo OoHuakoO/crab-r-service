@@ -11,4 +11,6 @@ router.post("/remove-fcm-token", verifyToken, userController.removeFcmToken);
 
 router.post("/removeUser", verifyToken, userController.removeUser);
 
+router.post("/forget-password",  userController.forgetPassword);
+
 module.exports = router;

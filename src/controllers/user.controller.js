@@ -1,5 +1,4 @@
 const userService = require("../services/user.service");
-
 const bcrypt = require("bcryptjs");
 
 async function register(req, res, next) {
@@ -150,9 +149,44 @@ async function removeUser(req, res, next) {
 }
 
 
+async function forgetPassword(req, res, next) {
+  try {
+    console.log(
+      "start forgetPassword.controller req body :",
+      JSON.stringify(req?.body, null, 2)
+    );
+ 
+    const { email } = req.body;
+
+    const user = await userService.findByEmail(email);
+
+    if (!user) {
+      return res.json({ data: "user not found", status: 404 });
+    }
+
+    const isSuccess = await userService.forgetPassword(user)
+
+    console.log(`successfully send mail forget password`);
+
+    if(isSuccess){
+      return res.json({ data: "successfully send mail forget password", status: 200 });
+    }
+ 
+  } catch (err) {
+    console.error(
+      `forgetPassword.controller error while forgetPassword`,
+      err.message
+    );
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
+
 module.exports = {
   register,
   login,
   removeFcmToken,
-  removeUser
+  removeUser,
+  forgetPassword
 };
