@@ -13,4 +13,6 @@ router.post("/removeUser", verifyToken, userController.removeUser);
 
 router.post("/forget-password",  userController.forgetPassword);
 
+router.get("/", verifyToken,userController.getUser);
+
 module.exports = router;

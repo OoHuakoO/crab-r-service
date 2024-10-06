@@ -182,11 +182,37 @@ async function forgetPassword(req, res, next) {
   }
 }
 
+async function getUser(req, res, next) {
+  try {
+    console.log("start getUser.controller");
+
+    const userId = req.user.user_id;
+    const user = await userService.findByID(userId);
+    if (!user) {
+      return res.json({
+        data: "user not found please try again",
+        status: 400,
+      });
+    }
+
+    return res.json({
+      data: user,
+      status: 200,
+    });
+    
+  } catch (err) {
+    console.error(`register.controller error while creating user`, err.message);
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
 
 module.exports = {
   register,
   login,
   removeFcmToken,
   removeUser,
-  forgetPassword
+  forgetPassword,
+  getUser
 };

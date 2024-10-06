@@ -6,6 +6,22 @@ const FcmTokenDevice = require("../models/fcmTokenDevice.model");
 const User = require("../models/user.model");
 require("dotenv").config();
 
+async function findByID(userId) {
+  try {
+    console.log("start user.service findByID");
+
+    const user = await User.findById({ _id: userId });
+
+    return user;
+  } catch (error) {
+    console.error(
+      "user.service error findByID:",
+      error
+    );
+    throw error;
+  }
+}
+
 async function findByEmail(email) {
   try {
     console.log("start user.service findByEmail email:", email);
@@ -15,7 +31,7 @@ async function findByEmail(email) {
     return user;
   } catch (error) {
     console.error(
-      "login.service error findByEmail:",
+      "user.service error findByEmail:",
       error
     );
     throw error;
@@ -44,7 +60,7 @@ async function register(email, password,name,surname,location) {
 
     return user;
   } catch (error) {
-    console.error("login.service error register:", error);
+    console.error("user.service error register:", error);
     throw error;
   }
 }
@@ -52,7 +68,7 @@ async function register(email, password,name,surname,location) {
 async function login(user) {
   try {
     console.log(
-      "start login.service with user:",
+      "start user.service login with user:",
       JSON.stringify(user, null, 2)
     );
 
@@ -65,7 +81,7 @@ async function login(user) {
 
     return user;
   } catch (error) {
-    console.error("login.service error while login:", error);
+    console.error("user.service error while login:", error);
     throw error;
   }
 }
@@ -169,6 +185,7 @@ async function forgetPassword(user) {
 }
 
 module.exports = {
+  findByID,
   findByEmail,
   register,
   login,
