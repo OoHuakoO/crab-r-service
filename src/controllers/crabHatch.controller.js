@@ -69,7 +69,7 @@ async function getCrabHatchById(req, res, next) {
     if (!crabHatch) {
       return res.json({
         data: "crabHatch not found",
-        status: 404,
+        status: 400,
       });
     }
     return res.json({

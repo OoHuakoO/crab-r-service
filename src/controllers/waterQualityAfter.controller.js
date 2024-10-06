@@ -104,7 +104,7 @@ async function getWaterQualityAfterById(req, res, next) {
     if (!waterQualityAfter) {
       return res.json({
         data: "water quality after not found",
-        status: 404,
+        status: 400,
       });
     }
     res.json({

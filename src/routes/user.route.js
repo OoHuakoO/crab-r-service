@@ -3,6 +3,8 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const verifyToken = require("../middlewares/auth.middleware");
 
+router.get("/", verifyToken,userController.getUser);
+
 router.post("/register", userController.register);
 
 router.post("/login", userController.login);
@@ -13,6 +15,6 @@ router.post("/removeUser", verifyToken, userController.removeUser);
 
 router.post("/forget-password",  userController.forgetPassword);
 
-router.get("/", verifyToken,userController.getUser);
+router.post("/change-password",  userController.changePassword);
 
 module.exports = router;

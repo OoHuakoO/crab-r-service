@@ -92,7 +92,7 @@ async function removeFcmToken(req, res, next) {
       const resultRemove = await userService.removeFcmToken(userId, fcmToken,platform);
 
       if (resultRemove.deletedCount === 0) {
-        return res.json({ data: "fcmToken not found", status: 404 });
+        return res.json({ data: "fcmToken not found", status: 400 });
       }
 
       console.log(`successfully removed fcmToken ${fcmToken} for user ${userId}`);
@@ -125,13 +125,13 @@ async function removeUser(req, res, next) {
       const resultRemove = await userService.removeFcmToken(userId, fcmToken,platform);
 
       if (resultRemove.deletedCount === 0) {
-        return res.json({ data: "fcmToken not found", status: 404 });
+        return res.json({ data: "fcmToken not found", status: 400 });
       }
 
       const resultRemoveUser = await userService.removeUser(userId);
 
       if (resultRemoveUser.deletedCount === 0) {
-        return res.json({ data: "user not found", status: 404 });
+        return res.json({ data: "user not found", status: 400 });
       }
 
       console.log(`successfully removed fcmToken ${fcmToken} for user ${userId}`);
@@ -148,7 +148,6 @@ async function removeUser(req, res, next) {
   }
 }
 
-
 async function forgetPassword(req, res, next) {
   try {
     console.log(
@@ -161,7 +160,7 @@ async function forgetPassword(req, res, next) {
     const user = await userService.findByEmail(email);
 
     if (!user) {
-      return res.json({ data: "user not found", status: 404 });
+      return res.json({ data: "user not found", status: 400 });
     }
 
     const isSuccess = await userService.forgetPassword(user)
@@ -181,6 +180,37 @@ async function forgetPassword(req, res, next) {
     next(err);
   }
 }
+
+async function changePassword(req, res, next) {
+  try {
+    console.log(
+      "start changePassword.controller req body :",
+      JSON.stringify(req?.body, null, 2)
+    );
+    const { token , password } = req.body;
+    const user = await userService.findByResetToken(token);
+
+    if (!user) {
+      return res.json({ data: 'Invalid or expired token', status: 400 });
+    }
+
+    const isSuccess = await userService.changePassword(user,password)
+
+    console.log(`successfully change password`);
+    if(isSuccess){
+      return res.json({ data: "successfully change password", status: 200 });
+    }
+ 
+  } catch (err) {
+    console.error(
+      `changePassword.controller error while changePassword`,
+      err.message
+    );
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
 
 async function getUser(req, res, next) {
   try {
@@ -214,5 +244,6 @@ module.exports = {
   removeFcmToken,
   removeUser,
   forgetPassword,
+  changePassword,
   getUser
 };

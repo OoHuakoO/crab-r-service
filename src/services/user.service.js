@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer'); 
 const FcmTokenDevice = require("../models/fcmTokenDevice.model");
 const User = require("../models/user.model");
+
 require("dotenv").config();
 
 async function findByID(userId) {
@@ -32,6 +33,22 @@ async function findByEmail(email) {
   } catch (error) {
     console.error(
       "user.service error findByEmail:",
+      error
+    );
+    throw error;
+  }
+}
+
+async function findByResetToken(token) {
+  try {
+    console.log("start user.service findByResetToken");
+
+    const user = await User.findOne({ resetToken: token ,resetTokenExpiry:{ $gt: Date.now() }});
+
+    return user;
+  } catch (error) {
+    console.error(
+      "user.service error findByResetToken:",
       error
     );
     throw error;
@@ -153,29 +170,48 @@ async function forgetPassword(user) {
   try {
     console.log("start user.service forgetPassword");
 
-     const resetToken = crypto.randomBytes(32).toString('hex');
-     user.resetToken = resetToken;
-     user.resetTokenExpiry = Date.now() + 3600000; // Token หมดอายุภายใน 1 ชั่วโมง
- 
-     await user.save();
- 
-     const transporter = nodemailer.createTransport({
-       service: 'gmail', 
-       auth: {
-         user: process.env.EMAIL_SENDER,
-         pass: process.env.PASSWORD_SENDER,
-       },
-     });
- 
-     const mailOptions = {
-       to: user.email,
-       from: process.env.EMAIL_SENDER,
-       subject: 'Reset Password',
-       text: `กดที่ลิงก์เพื่อตั้งรหัสผ่านใหม่: \n \n
-       http://localhost:3000/reset-password/${resetToken}`,
-     };
- 
-     await transporter.sendMail(mailOptions);
+    const resetToken = crypto.randomBytes(3).toString('hex');
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = Date.now() + 3600000; // Token หมดอายุภายใน 1 ชั่วโมง
+
+    await user.save();
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_SENDER,
+        pass: process.env.PASSWORD_SENDER,
+      },
+    });
+
+    const mailOptions = {
+      to: user.email,
+      from: process.env.EMAIL_SENDER,
+      subject: 'Crab R Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+          <div style="background-color: #133D79; padding: 20px; text-align: center;">
+            <h1 style="color: white; font-size: 24px;">Crab R Verification Code</h1>
+          </div>
+          <div style="padding: 20px;">
+            <p>สวัสดีคุณ ${user.name},</p>
+            <p>เราได้รับคำขอให้รีเซ็ตรหัสผ่านสำหรับบัญชี Crab R Application ของคุณ รหัสยืนยันของคุณคือ:</p>
+            <h2 style="font-size: 36px; text-align: center; color: #333;">${resetToken}</h2>
+            <p style="font-size: 14px; color: #555;">
+              หากคุณไม่ได้ร้องขอรหัสนี้ อาจเป็นไปได้ว่ามีคนพยายามเข้าถึงบัญชีของคุณ
+              กรุณาอย่าส่งต่อหรือบอกรหัสนี้ให้ผู้อื่นทราบ
+            </p>
+            <p style="font-size: 14px; color: #555;">
+              รหัสนี้จะหมดอายุภายใน 60 นาที หากคุณไม่ได้ร้องขอให้รีเซ็ตรหัสผ่าน กรุณาละเว้นอีเมลนี้
+            </p>
+            <br/>
+            <p>ขอแสดงความนับถือ,<br/>ทีมงาน Crab R</p>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     return true;
   } catch (error) {
@@ -183,6 +219,25 @@ async function forgetPassword(user) {
     throw error;
   }
 }
+
+async function changePassword(user,password) {
+  try {
+    console.log("start user.service changePassword");
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    user.password = encryptedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    return true;
+  } catch (error) {
+    console.error("user.service changePassword error:", error);
+    throw error;
+  }
+}
+
 
 module.exports = {
   findByID,
@@ -192,5 +247,7 @@ module.exports = {
   createFcmToken,
   removeFcmToken,
   removeUser,
-  forgetPassword
+  forgetPassword,
+  findByResetToken,
+  changePassword
 };
