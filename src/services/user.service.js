@@ -22,7 +22,7 @@ async function findByEmail(email) {
   }
 }
 
-async function register(email, password) {
+async function register(email, password,name,surname,location) {
   try {
     console.log("start user.service create email:", email);
 
@@ -30,6 +30,9 @@ async function register(email, password) {
     const user = await User.create({
       email: email,
       password: encryptedPassword,
+      name:name,
+      surname:surname,
+      location:location,
       role: "user",
     });
 
