@@ -27,20 +27,25 @@ app.use(
   })
 );
 
-mongoose.connect(process.env.MONGODB_URI, {
-  dbName: process.env.DB_NAME,
-  user: process.env.USER_DB,
-  pass: process.env.PASS_DB,
-});
+// mongoose.connect(process.env.MONGODB_URI, {
+//   dbName: process.env.DB_NAME,
+//   user: process.env.USER_DB,
+//   pass: process.env.PASS_DB,
+// });
 
-// mongoose.connect('mongodb://127.0.0.1:27017/crab-r');
+mongoose.connect("mongodb://127.0.0.1:27017/crab-r", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
-  console.log("Connected to MongoDB");
+  console.log("Connected to MongoDB (Local)");
 });
+
+// mongoose.connect('mongodb://127.0.0.1:27017/crab-r');
 
 app.use("/user", user);
 app.use("/common", common);
@@ -69,23 +74,23 @@ const getAccessToken = () => {
   });
 };
 
-cron.schedule("0 6 * * *", async () => {
-  const today = new Date().toISOString().split("T")[0];
-  const startOfDay = new Date(today);
-  const endOfDay = new Date(today);
-  endOfDay.setDate(endOfDay.getDate() + 1);
+// cron.schedule("0 6 * * *", async () => {
+//   const today = new Date().toISOString().split("T")[0];
+//   const startOfDay = new Date(today);
+//   const endOfDay = new Date(today);
+//   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  try {
-    const crabsToNotify = await getCrabsToNotify(startOfDay, endOfDay);
-    if (crabsToNotify.length > 0) {
-      await notifyUsers(crabsToNotify);
-    } else {
-      console.log('No crabs to notify today.');
-    }
-  } catch (error) {
-    console.error(`Error fetching data: ${error}`);
-  }
-});
+//   try {
+//     const crabsToNotify = await getCrabsToNotify(startOfDay, endOfDay);
+//     if (crabsToNotify.length > 0) {
+//       await notifyUsers(crabsToNotify);
+//     } else {
+//       console.log('No crabs to notify today.');
+//     }
+//   } catch (error) {
+//     console.error(`Error fetching data: ${error}`);
+//   }
+// });
 
 // Function to fetch crabs that need to be notified
 async function getCrabsToNotify(startOfDay, endOfDay) {

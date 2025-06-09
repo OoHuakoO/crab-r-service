@@ -66,6 +66,78 @@ async function createWaterQualityBefore(req, res, next) {
   }
 }
 
+async function updateWaterQualityBefore(req, res, next) {
+  try {
+    console.log(
+      "start updateWaterQualityBefore.controller  req body :",
+      req?.body
+    );
+    console.log(
+      "start updateWaterQualityBefore.controller  req files :",
+      req?.files
+    );
+
+    const { id,location, salinity, ph, alkaline } = req.body;
+    const { salinityImg, phImg, alkalineImg } = req.files;
+
+    if (!id) {
+      return res.json({
+        data: "missing ID in updateWaterQualityBefore",
+        status: 400,
+      });
+    }
+
+    if (!(location &&  salinity && ph && alkaline)) {
+      return res.json({
+        data: "All input is required",
+        status: 400,
+      });
+    }
+
+    let salinityImgUrl;
+    let phImgUrl;
+    let alkalineImgUrl;
+    if (salinityImg && salinityImg.length > 0) {
+      salinityImgUrl = await uploadFileFirebase(salinityImg[0]);
+    }
+    if (phImg && phImg.length > 0) {
+      phImgUrl = await uploadFileFirebase(phImg[0]);
+    }
+    if (alkalineImg && alkalineImg.length > 0) {
+      alkalineImgUrl = await uploadFileFirebase(alkalineImg[0]);
+    }
+
+    const waterQualityBefore = {
+      id,
+      location,
+      salinity,
+      ph,
+      alkaline,
+      salinityImg: salinityImgUrl,
+      phImg: phImgUrl,
+      alkalineImg: alkalineImgUrl,
+    };
+
+    const saveWaterQualityBefore =
+      await waterQualityBeforeService.updateWaterQualityBefore(
+        waterQualityBefore
+      );
+      
+    console.log(
+      "saved WaterQualityBefore in controller:",
+      saveWaterQualityBefore
+    );
+    return res.json({
+      data: saveWaterQualityBefore,
+      status: 200,
+    });
+  } catch (err) {
+    console.error("updateWaterQualityBefore.controller error:", err.message);
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
 async function getWaterQualityBefore(req, res, next) {
   try {
     console.log("start getWaterQualityBefore.controller req query", req?.query);
@@ -82,6 +154,25 @@ async function getWaterQualityBefore(req, res, next) {
     });
   } catch (err) {
     console.error("getWaterQualityBefore.controller error:", err.message);
+    res.json({ data: err.message, status: 500 });
+    next(err);
+  }
+}
+
+async function adminGetWaterQualityBefore(req, res, next) {
+  try {
+    console.log("start adminGetWaterQualityBefore.controller req query", req?.query);
+
+    const waterQualityBefore =
+      await waterQualityBeforeService.getWaterQualityBefore(null, req?.query);
+
+    return res.json({
+      data: waterQualityBefore.data,
+      total: waterQualityBefore.total,
+      status: 200,
+    });
+  } catch (err) {
+    console.error("adminGetWaterQualityBefore.controller error:", err.message);
     res.json({ data: err.message, status: 500 });
     next(err);
   }
@@ -119,4 +210,6 @@ module.exports = {
   createWaterQualityBefore,
   getWaterQualityBefore,
   getWaterQualityBeforeById,
+  adminGetWaterQualityBefore,
+  updateWaterQualityBefore
 };

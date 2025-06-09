@@ -5,6 +5,11 @@ const LocationSchema = new mongoose.Schema(
     name: {
       type: String,
       unique: true,
+      required: true
+    },
+     maxPool: {
+      type: Number,
+      required: true
     },
     createdAt: {
       type: Date,

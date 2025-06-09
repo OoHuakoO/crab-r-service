@@ -16,11 +16,31 @@ router.post(
   ]),
   waterQualityController.createWaterQualityAfter
 );
+
+router.post(
+  "/updateWaterQualityAfter",
+  verifyToken,
+  upload.fields([
+    { name: "chlorineImg", maxCount: 1 },
+    { name: "ammoniaImg", maxCount: 1 },
+    { name: "calciumImg", maxCount: 1 },
+    { name: "magnesiumImg", maxCount: 1 },
+  ]),
+  waterQualityController.updateWaterQualityAfter
+);
+
 router.get(
   "/getWaterQualityAfter",
   verifyToken,
   waterQualityController.getWaterQualityAfter
 );
+
+router.get(
+  "/adminGetWaterQualityAfter",
+   verifyToken,
+  waterQualityController.adminGetWaterQualityAfter
+);
+
 router.get(
   "/getWaterQualityAfterById/:id",
   verifyToken,

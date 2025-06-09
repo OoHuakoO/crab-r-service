@@ -23,6 +23,36 @@ async function createWaterQualityBefore(waterQualityBefore) {
   }
 }
 
+async function updateWaterQualityBefore(waterQualityBefore) {
+  try {
+    console.log(
+      "start waterQualityBefore.service updateWaterQualityBefore:",
+      JSON.stringify(waterQualityBefore)
+    );
+
+    const { id, ...updateData } = waterQualityBefore;
+
+    const updatedWaterQualityBefore =
+      await WaterQualityBefore.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      });
+
+    if (!updatedWaterQualityBefore) {
+      throw new Error(`WaterQualityBefore with id ${id} not found`);
+    }
+
+    console.log("updated WaterQualityBefore:", updatedWaterQualityBefore);
+    return updatedWaterQualityBefore;
+  } catch (error) {
+    console.error(
+      "waterQualityBefore.service updateWaterQualityBefore error:",
+      error
+    );
+    throw error;
+  }
+}
+
 async function getWaterQualityBefore(userId, query) {
   try {
     console.log(
@@ -33,17 +63,14 @@ async function getWaterQualityBefore(userId, query) {
     const page = parseInt(query?.page || 1);
     const limit = parseInt(query?.limit || 10);
     const offset = (page - 1) * limit;
+    const filter = userId ? { userId } : {};
 
-    const waterQualityBefore = await WaterQualityBefore.find({
-      userId: userId,
-    })
+    const waterQualityBefore = await WaterQualityBefore.find(filter)
       .sort({ createdAt: "desc" })
       .skip(offset)
       .limit(limit);
 
-    const total = await WaterQualityBefore.countDocuments({
-      userId: userId,
-    });
+    const total = await WaterQualityBefore.countDocuments(filter);
 
     return { data: waterQualityBefore, total: total };
   } catch (error) {
@@ -77,4 +104,5 @@ module.exports = {
   createWaterQualityBefore,
   getWaterQualityBefore,
   getWaterQualityBeforeById,
+  updateWaterQualityBefore,
 };

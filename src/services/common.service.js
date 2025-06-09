@@ -1,5 +1,4 @@
 const Location = require("../models/location.model");
-const Pool = require("../models/pool.model");
 
 async function findByNameLocation(name) {
   try {
@@ -12,13 +11,21 @@ async function findByNameLocation(name) {
   }
 }
 
-async function createLocation(name) {
+async function upsertLocation(name, maxPool) {
   try {
     console.log("start location.service createLocation name:", name);
-    const location = await Location.create({ name: name });
+    const location = await Location.findOneAndUpdate(
+      { name }, 
+      { name, maxPool }, 
+      {
+        new: true,
+        upsert: true, 
+        setDefaultsOnInsert: true, 
+      }
+    );
     return location;
   } catch (error) {
-    console.error("location.service error while createLocation:", error);
+    console.error("location.service error while upsertLocation:", error);
     throw error;
   }
 }
@@ -34,44 +41,8 @@ async function findAllLocation() {
   }
 }
 
-async function findByNamePool(name) {
-  try {
-    console.log("start pool.service findByNamePool name:", name);
-    const pool = await Pool.findOne({ name: name });
-    return pool;
-  } catch (error) {
-    console.error("pool.service error while findByNamePool:", error);
-    throw error;
-  }
-}
-
-async function createPool(name) {
-  try {
-    console.log("start pool.service createPool name:", name);
-    const pool = await Pool.create({ name: name });
-    return pool;
-  } catch (error) {
-    console.error("pool.service error while createPool:", error);
-    throw error;
-  }
-}
-
-async function findAllPool() {
-  try {
-    console.log("start pool.service findAllPool");
-    const pools = await Pool.find();
-    return pools;
-  } catch (error) {
-    console.error("pool.service error while findAllPool:", error);
-    throw error;
-  }
-}
-
 module.exports = {
   findByNameLocation,
-  createLocation,
+  upsertLocation,
   findAllLocation,
-  findByNamePool,
-  createPool,
-  findAllPool,
 };

@@ -8,7 +8,17 @@ router.post(
   verifyToken,
   crabHatchController.createCrabHatch
 );
+
+router.post(
+  "/updateCrabHatch",
+  verifyToken,
+  crabHatchController.updateCrabHatch
+);
+
 router.get("/crabHatchAll", verifyToken, crabHatchController.getCrabHatch);
+
+router.get("/adminCrabHatchAll", verifyToken, crabHatchController.adminCrabHatchAll);
+
 router.get(
   "/crabHatchById/:id",
   verifyToken,
