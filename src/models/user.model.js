@@ -18,6 +18,9 @@ const UserSchema = new mongoose.Schema(
     location: {
       type: String,
     },
+    phone: {
+      type: String,
+    },
     role: {
       type: String,
     },

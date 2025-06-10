@@ -55,7 +55,7 @@ async function findByResetToken(token) {
   }
 }
 
-async function register(email, password,name,surname,location) {
+async function register(email, password,name,surname,location,phone) {
   try {
     console.log("start user.service create email:", email);
 
@@ -66,6 +66,7 @@ async function register(email, password,name,surname,location) {
       name:name,
       surname:surname,
       location:location,
+      phone:phone,
       role: "user",
     });
 

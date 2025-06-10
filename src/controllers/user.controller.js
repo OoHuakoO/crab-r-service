@@ -5,9 +5,9 @@ async function register(req, res, next) {
   try {
     console.log("start register.controller  req body :", req?.body);
 
-    const { email, password, name,surname,location, fcmToken , platform } = req?.body;
+    const { email, password, name,surname,location, phone ,fcmToken , platform } = req?.body;
 
-    if (!(email && password && name && surname && location)) {
+    if (!(email && password && name && surname && location && phone)) {
       return res.json({
         data: "all input is required",
         status: 400,
@@ -21,7 +21,7 @@ async function register(req, res, next) {
         status: 409,
       });
     }
-    const userRegister = await userService.register(email, password,name,surname,location);
+    const userRegister = await userService.register(email, password,name,surname,location ,phone );
 
     if(fcmToken){
       await userService.createFcmToken(userRegister._id, fcmToken,platform);
